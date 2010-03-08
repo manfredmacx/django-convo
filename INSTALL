@@ -1,0 +1,12 @@
+Thanks for downloading Django-convo
+
+To install, run the following command inside this directory:
+
+    python setup.py install
+
+Or if you'd prefer, you can simply place the included ``convo`` directory
+somewhere on your PYTHONPATH, or symlink to it from somewhere on your
+PYTHONPATH; this is useful if you're working from a Git checkout.
+
+Note that this application was developed using Django 1.1 and Python 2.6.  It may work with other versions, but has not been tested.
+You can obtain Python from http://www.python.org/ and Django from http://www.djangoproject.com/.

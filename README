@@ -1,0 +1,13 @@
+============
+Django convo
+============
+
+A Django app to create a threaded forum.
+
+Key features:
+A logged in user can edit posts they create or children of posts they create.  That is, a user has limited mod privileges in their own threads.
+
+A logged in user can also edit any post by an anonymous user.
+
+Dependencies:
+Django-wysiwyg (http://github.com/pydanny/django-wysiwyg)
