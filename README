@@ -10,4 +10,5 @@ A logged in user can edit posts they create or children of posts they create.  T
 A logged in user can also edit any post by an anonymous user.
 
 Dependencies:
-Django-wysiwyg (http://github.com/pydanny/django-wysiwyg)
+Django-wysiwyg - WYSIWYG editor for creating and editing entries  (http://github.com/pydanny/django-wysiwyg)
+Bleach - HTML sanitizer for cleaning user-submitted content (http://pypi.python.org/pypi/bleach)
