@@ -68,11 +68,33 @@ def show_entry(request, e_id, template_name='convo/show.html', extra_context = N
 	t = loader.get_template(template_name)
 	if extra_context is None:
 		extra_context = {}
-	extra_context['e'] = e
-	if request.user.is_authenticated() and e.userCanEdit(request.user):
-		extra_context['editable'] = True
+	extra_context['entry_template'] = get_entry_template(request, e)
 	c = getContext(request, extra_context)
 	return HttpResponse(t.render(c))
+
+def show_convo(request, e_id, template_name='convo/show_convo.html', extra_context = None):
+	""" Display a threaded conversation """
+	e = Entry.objects.get(pk=e_id)	
+	from convo import Convo
+	es = Convo.getConvo(e)
+	entries = []
+	for en in es:
+		entries.append(get_entry_template(request, en))	
+	t = loader.get_template(template_name)
+	if extra_context is None:
+		extra_context = {}
+	extra_context['entries'] = entries
+	c = getContext(request, extra_context)
+	return HttpResponse(t.render(c))
+
+def get_entry_template(request, entry, template_name="convo/single_entry.html"):
+	""" Return the rendered template for a single item """
+	t = loader.get_template(template_name)
+	c = RequestContext(request, {
+		"editable" : request.user.is_authenticated() and e.userCanEdit(request.user),
+		"e" : entry,
+	})
+	return t.render(c)
 
 @login_required	
 def edit_entry(request, e_id, form_class=None, success_url=None,
@@ -98,7 +120,7 @@ def edit_entry(request, e_id, form_class=None, success_url=None,
 		context = getContext(request, extra_context)   
 		return render_to_response(template_name, { 'form': form, 'e' : e, }, context_instance=context)
 	else:
-		return HttpResponse("You are not authorized to perform that action.")
+		return HttpResponseRedirect("/")
 		
 
 	
