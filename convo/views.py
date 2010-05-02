@@ -91,7 +91,7 @@ def get_entry_template(request, entry, template_name="convo/single_entry.html"):
 	""" Return the rendered template for a single item """
 	t = loader.get_template(template_name)
 	c = RequestContext(request, {
-		"editable" : request.user.is_authenticated() and e.userCanEdit(request.user),
+		"editable" : request.user.is_authenticated() and entry.userCanEdit(request.user),
 		"e" : entry,
 	})
 	return t.render(c)
