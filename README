@@ -9,6 +9,8 @@ A logged in user can edit posts they create or children of posts they create.  T
 
 A logged in user can also edit any post by an anonymous user.
 
+If the Django user's email is connected to a Gravatar account, that icon will be used to identify the user.  If not, a random default Gravatar icon will be used.  Free accounts available at http://www.gravatar.com
+
 Dependencies:
 Django-wysiwyg - WYSIWYG editor for creating and editing entries  (http://github.com/pydanny/django-wysiwyg)
 Bleach - HTML sanitizer for cleaning user-submitted content (http://pypi.python.org/pypi/bleach)
