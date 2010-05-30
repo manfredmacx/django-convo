@@ -23,7 +23,7 @@ class Entry(models.Model):
 	def isOriginal(self):
 		return self.original is None 
 			
-	def getOriginal(self):	
+	def getOriginal(self):
 		if self.isOriginal():
 			return self
 		else:
@@ -36,6 +36,10 @@ class Entry(models.Model):
 	def save(self, *args, **kwargs):
 		self.level = self.parent.level + 1 if self.parent is not None else 1
 		super(Entry, self).save(*args, **kwargs)
+		
+	#TODO - needs to be generic
+	def get_absolute_url(self):
+		return "/social/%i/convo" % self.id
 
 class Edit(models.Model):
 	edit_by = models.ForeignKey(User)
