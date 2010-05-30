@@ -13,6 +13,7 @@ class Entry(models.Model):
 	body = models.TextField(max_length = 4000)
 	owner = models.ForeignKey(User, null=True)
 	date_created = models.DateTimeField(auto_now_add=True)
+	date_modified = models.DateTimeField(auto_now=True)
 	level = models.IntegerField()
 	
 	objects = EntryManager()
