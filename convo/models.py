@@ -31,7 +31,7 @@ class Entry(models.Model):
 			return self.original
 			
 	def userCanEdit(self, user):
-		return (self.owner == user or (self.isOriginal() 
+		return (self.owner == user or (self.isOriginal() and self.original is not None 
 			and self.original.owner == user) or self.owner is None)
 
 	def save(self, *args, **kwargs):

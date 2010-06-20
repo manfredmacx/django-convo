@@ -8,7 +8,6 @@ def mult(value, arg):
 	return value * arg
 
 import urllib, hashlib
-from django.utils.translation import ugettext as _
 from random import choice
 
 class Gravatar(template.Node):
@@ -23,7 +22,7 @@ class Gravatar(template.Node):
 		except:
 			gravatar_url += "?"
 		gravatar_url += urllib.urlencode({'d':default, 'size':str(size)})
-		return gravatar_url		
+		return gravatar_url
 
 def get_gravatar_url(parser, token):
 	try:
