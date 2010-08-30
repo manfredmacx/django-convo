@@ -1,10 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Max
 
 class EntryManager(models.Manager):
 	def get_convo(self, entry):
 		""" return this object and all children """
 		return self.filter(models.Q(original=entry) | models.Q(pk=entry.id))
+		
+	def get_convo_last_modified(self, entry):
+		return self.get_convo(entry).order_by('date_modified').reverse()[0]
 
 class Entry(models.Model):
 	original = models.ForeignKey('self', null=True, related_name="orginal_entry")
@@ -31,8 +35,9 @@ class Entry(models.Model):
 			return self.original
 			
 	def userCanEdit(self, user):
-		return (self.owner == user or (self.isOriginal() and self.original is not None 
-			and self.original.owner == user) or self.owner is None)
+		orig = self.getOriginal()
+		own = self.owner or None
+		return (own == user or orig.owner == user or own is None)
 
 	def save(self, *args, **kwargs):
 		self.level = self.parent.level + 1 if self.parent is not None else 1
@@ -41,6 +46,14 @@ class Entry(models.Model):
 	#TODO - needs to be generic
 	def get_absolute_url(self):
 		return "/social/%i/convo" % self.id
+		
+	def _convo_last_mod_date(self):
+		return self.objects.get_convo_last_modified(self).date_modified
+
+	def __cmp__(self, other):
+		return cmp(self.date_modified, other.date_modified)
+		
+	convo_last_mod_date = property(_convo_last_mod_date)
 
 class Edit(models.Model):
 	edit_by = models.ForeignKey(User)

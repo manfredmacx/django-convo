@@ -5,7 +5,7 @@ Django convo
 A Django app to create a threaded forum.
 
 Key features:
-A logged in user can edit posts they create or children of posts they create.  That is, a user has limited mod privileges in their own threads.
+A logged in user can edit their own post, as well as any post in a thread they create.  This means that each user, upon registering, can have mod privileges on their own threads.  The intent is to allow the community to self-moderate.
 
 A logged in user can also edit any post by an anonymous user.
 
@@ -14,3 +14,7 @@ If the Django user's email is connected to a Gravatar account, that icon will be
 Dependencies:
 Django-wysiwyg - WYSIWYG editor for creating and editing entries  (http://github.com/pydanny/django-wysiwyg)
 Bleach - HTML sanitizer for cleaning user-submitted content (http://pypi.python.org/pypi/bleach)
+
+This app is live and in production at http://www.manfredmacx.com/social/
+
+

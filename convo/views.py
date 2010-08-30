@@ -74,7 +74,7 @@ def show_entry(request, e_id, template_name='convo/show.html', extra_context = N
 
 def show_convo(request, e_id, template_name='convo/show_convo.html', extra_context = None):
 	""" Display a threaded conversation """
-	e = Entry.objects.get(pk=e_id)	
+	e = Entry.objects.get(pk=e_id)
 	from convo import Convo
 	es = Convo.getConvo(e)
 	entries = []
@@ -93,6 +93,7 @@ def get_entry_template(request, entry, template_name="convo/single_entry.html"):
 	c = RequestContext(request, {
 		"editable" : request.user.is_authenticated() and entry.userCanEdit(request.user),
 		"e" : entry,
+		"edits" : entry.edit_set.select_related(),
 	})
 	return t.render(c)
 
