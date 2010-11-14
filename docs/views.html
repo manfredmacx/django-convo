@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>views.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>views.py</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-0'>
+      <td class=docs>
+        <div class="octowrap">
+          <a class="octothorpe" href="#section-0">#</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><div class="highlight"><pre><span class="s">r&quot;&quot;&quot; </span>
+<span class="s">	Default views</span>
+<span class="s">	Design pattern copied nearly verbatim from django-profile</span>
+<span class="s">	(http://code.google.com/p/django-profile/)</span>
+<span class="s">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.template</span> <span class="kn">import</span> <span class="n">RequestContext</span><span class="p">,</span> <span class="n">loader</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">convo</span> <span class="kn">import</span> <span class="n">Convo</span>
+<span class="kn">from</span> <span class="nn">convo.models</span> <span class="kn">import</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Edit</span>
+
+<span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">nparent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">form_class</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">success_url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+			<span class="n">template_name</span><span class="o">=</span><span class="s">&#39;convo/add_new.html&#39;</span><span class="p">,</span>
+			<span class="n">extra_context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Create a new Entry &quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="n">form_class</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">form_class</span> <span class="o">=</span> <span class="n">Convo</span><span class="o">.</span><span class="n">getForm</span><span class="p">()</span>
+	<span class="k">if</span> <span class="n">success_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">success_url</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span>
+	<span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+		<span class="n">form</span> <span class="o">=</span> <span class="n">form_class</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+			<span class="n">en</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+				<span class="n">en</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+			<span class="n">en</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">nparent</span>
+			<span class="k">if</span> <span class="n">nparent</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="n">en</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="bp">None</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">nparent</span><span class="o">.</span><span class="n">original</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+					<span class="n">en</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">nparent</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">en</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">nparent</span><span class="o">.</span><span class="n">original</span>
+			<span class="n">en</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+			<span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">success_url</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">form</span> <span class="o">=</span> <span class="n">form_class</span><span class="p">()</span>
+	<span class="k">if</span> <span class="n">nparent</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">action_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;add_new_convo_entry&#39;</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">action_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;add_child_convo_entry&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;parent_id&quot;</span><span class="p">:</span><span class="n">nparent</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>    
+	<span class="n">context</span> <span class="o">=</span> <span class="n">getContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">)</span>   
+	<span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s">&quot;action_url&quot;</span> <span class="p">:</span> <span class="n">action_url</span> <span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">getContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Combine passed-in extra_context with RequestContext object &quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="n">extra_context</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">extra_context</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">context</span> <span class="o">=</span> <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">extra_context</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+		<span class="n">context</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="p">()</span> <span class="ow">or</span> <span class="n">value</span>
+	<span class="k">return</span> <span class="n">context</span>
+	    
+<span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">form_class</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">success_url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+			<span class="n">template_name</span><span class="o">=</span><span class="s">&#39;convo/add_new.html&#39;</span><span class="p">,</span>
+			<span class="n">extra_context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Create a new Entry that is the child of the passed-in Entry &quot;&quot;&quot;</span>
+	<span class="n">parent</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">parent_id</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">add_new</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">form_class</span><span class="p">,</span> <span class="n">success_url</span><span class="p">,</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">show_entry</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">e_id</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&#39;convo/show.html&#39;</span><span class="p">,</span> <span class="n">extra_context</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Display an Entry &quot;&quot;&quot;</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">e_id</span><span class="p">)</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">extra_context</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">extra_context</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">extra_context</span><span class="p">[</span><span class="s">&#39;entry_template&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_entry_template</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+	<span class="n">c</span> <span class="o">=</span> <span class="n">getContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">show_convo</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">e_id</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&#39;convo/show_convo.html&#39;</span><span class="p">,</span> <span class="n">extra_context</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Display a threaded conversation &quot;&quot;&quot;</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">e_id</span><span class="p">)</span>
+	<span class="kn">from</span> <span class="nn">convo</span> <span class="kn">import</span> <span class="n">Convo</span>
+	<span class="n">es</span> <span class="o">=</span> <span class="n">Convo</span><span class="o">.</span><span class="n">getConvo</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+	<span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">en</span> <span class="ow">in</span> <span class="n">es</span><span class="p">:</span>
+		<span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_entry_template</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">en</span><span class="p">))</span>	
+	<span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">extra_context</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="n">extra_context</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">extra_context</span><span class="p">[</span><span class="s">&#39;entries&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entries</span>
+	<span class="n">c</span> <span class="o">=</span> <span class="n">getContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">get_entry_template</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&quot;convo/single_entry.html&quot;</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Return the rendered template for a single item &quot;&quot;&quot;</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
+	<span class="n">c</span> <span class="o">=</span> <span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="p">{</span>
+		<span class="s">&quot;editable&quot;</span> <span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">userCanEdit</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span>
+		<span class="s">&quot;e&quot;</span> <span class="p">:</span> <span class="n">entry</span><span class="p">,</span>
+		<span class="s">&quot;edits&quot;</span> <span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">edit_set</span><span class="o">.</span><span class="n">select_related</span><span class="p">(),</span>
+	<span class="p">})</span>
+	<span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+<span class="nd">@login_required</span>	
+<span class="k">def</span> <span class="nf">edit_entry</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">e_id</span><span class="p">,</span> <span class="n">form_class</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">success_url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+				<span class="n">template_name</span><span class="o">=</span><span class="s">&#39;convo/edit.html&#39;</span><span class="p">,</span> <span class="n">extra_context</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; Edit an Entry &quot;&quot;&quot;</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">e_id</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">userCanEdit</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">form_class</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="n">form_class</span> <span class="o">=</span> <span class="n">Convo</span><span class="o">.</span><span class="n">getForm</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">success_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="n">success_url</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span>
+		<span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+			<span class="n">form</span> <span class="o">=</span> <span class="n">form_class</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+				<span class="n">en</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+				<span class="n">edit</span> <span class="o">=</span> <span class="n">Edit</span><span class="p">()</span>
+				<span class="n">edit</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">en</span>
+				<span class="n">edit</span><span class="o">.</span><span class="n">edit_by</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+				<span class="n">edit</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+			<span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">success_url</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">form</span> <span class="o">=</span> <span class="n">form_class</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>   
+		<span class="n">context</span> <span class="o">=</span> <span class="n">getContext</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="p">)</span>   
+		<span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s">&#39;e&#39;</span> <span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>
+		
+
+	
+
+</pre></div></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
