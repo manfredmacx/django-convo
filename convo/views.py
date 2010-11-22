@@ -18,7 +18,7 @@ def add_new(request, nparent=None, form_class=None, success_url=None,
 			extra_context=None):
 	""" Create a new Entry """
 	if form_class is None:
-		form_class = Convo.getForm()
+		form_class = Convo.getForm(request.user)
 	if success_url is None:
 		success_url = "/"
 	if request.method == 'POST':
@@ -104,7 +104,7 @@ def edit_entry(request, e_id, form_class=None, success_url=None,
 	e = Entry.objects.get(pk=e_id)
 	if e.userCanEdit(request.user):
 		if form_class is None:
-			form_class = Convo.getForm()
+			form_class = Convo.getForm(request.user)
 		if success_url is None:
 			success_url = "/"
 		if request.method == 'POST':

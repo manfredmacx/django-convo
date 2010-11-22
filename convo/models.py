@@ -41,6 +41,9 @@ class Entry(models.Model):
 		orig = self.getOriginal()
 		own = self.owner or None
 		return (own == user or orig.owner == user or own is None)
+	
+	def _child_count(self):
+		return Entry.objects.filter(models.Q(original=self) | models.Q(pk=self.id)).count() - 1
 
 	def save(self, *args, **kwargs):
 		self.level = self.parent.level + 1 if self.parent is not None else 1
@@ -65,8 +68,10 @@ class Entry(models.Model):
 		
 	#TODO - needs to be generic
 	def get_absolute_url(self):
-		return "/social/%i/convo" % self.id
-		
+		if self.type == "BLOG":
+			return "/blog/{0}/{1}/{2}/{3}".format(self.date_created.year, self.date_created.month, self.date_created.day, self.slug)
+		return "/social/{0}/convo".format(self.id)
+			
 	def _convo_last_mod_date(self):
 		return self.objects.get_convo_last_modified(self).date_modified
 
@@ -74,6 +79,7 @@ class Entry(models.Model):
 		return cmp(self.date_modified, other.date_modified)
 		
 	convo_last_mod_date = property(_convo_last_mod_date)
+	child_count = property(_child_count)
 
 class Edit(models.Model):
 	edit_by = models.ForeignKey(User)
