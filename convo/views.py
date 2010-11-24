@@ -76,7 +76,7 @@ def show_convo(request, e_id, template_name='convo/show_convo.html', extra_conte
 	""" Display a threaded conversation """
 	e = Entry.objects.get(pk=e_id)
 	from convo import Convo
-	es = Convo.getConvo(e)
+	es, title = Convo.getConvoWithTitle(e)
 	entries = []
 	for en in es:
 		entries.append(get_entry_template(request, en))	
@@ -84,6 +84,7 @@ def show_convo(request, e_id, template_name='convo/show_convo.html', extra_conte
 	if extra_context is None:
 		extra_context = {}
 	extra_context['entries'] = entries
+	extra_context['title'] = title
 	c = getContext(request, extra_context)
 	return HttpResponse(t.render(c))
 

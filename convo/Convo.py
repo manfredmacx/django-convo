@@ -57,12 +57,16 @@ def getForm(user):
 	return _AnonForm
 
 def getConvo(entry):
+	s, t = getConvoWithTitle(entry)
+	return s
+	
+def getConvoWithTitle(entry):
 	""" return list containing a sorted Entry thread """
 	sorted = []
 	original = entry.getOriginal()
 	sorted.append(original)
 	sorted.extend(__sortConvo(Entry.objects.filter(parent=original)))
-	return sorted
+	return sorted, original.title
 	
 def __sortConvo(children):
 	""" Private function:  Sorts a queryset (or list) of Entries """
