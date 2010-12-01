@@ -1,7 +1,7 @@
 """
 	Util class
 """
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm, CharField, URLField
 from django.db import models
 from models import Entry
 
@@ -37,9 +37,10 @@ def getForm(user):
 			return m
 	class _AnonForm(ModelForm):
 		owner_if_anonymous = CharField(max_length = 150, label="Name")
+		url_if_anonymous = URLField(max_length=1000, label="URL", required=False)
 		class Meta:
 			model = Entry
-			fields = ('owner_if_anonymous', 'title', 'body')
+			fields = ('title', 'owner_if_anonymous', 'url_if_anonymous', 'body')
 		def save(self, force_insert=False, force_update=False, commit=True):
 			m = super(ModelForm, self).save(commit=False)
 			from bleach import Bleach
