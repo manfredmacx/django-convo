@@ -23,6 +23,7 @@ class Entry(models.Model):
 	date_modified = models.DateTimeField(auto_now=True)
 	level = models.IntegerField()
 	type = models.CharField(max_length=50, default="ALL")
+	published = models.BooleanField(default=True)
 	
 	objects = EntryManager()
 	
@@ -71,6 +72,8 @@ class Entry(models.Model):
 	def get_absolute_url(self):
 		if self.type == "BLOG":
 			return "/blog/{0}/{1}/{2}/{3}".format(self.date_created.year, self.date_created.month, self.date_created.day, self.slug)
+		if self.type == "PAGE":
+			return "/info/{0}".format(self.slug,)
 		return "/social/{0}/convo".format(self.id)
 			
 	def _convo_last_mod_date(self):

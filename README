@@ -17,4 +17,6 @@ Bleach - HTML sanitizer for cleaning user-submitted content (http://pypi.python.
 
 This app is live and in production at http://www.manfredmacx.com/social/
 
+HOWEVER - it is definitely a work in progress, and SHOULD NOT BE CONSIDERED STABLE
+
 

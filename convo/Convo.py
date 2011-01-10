@@ -25,16 +25,7 @@ def getForm(user):
 		class Meta:
 			model = Entry
 			fields = ('title', 'body',)
-		def save(self, force_insert=False, force_update=False, commit=True):
-			m = super(ModelForm, self).save(commit=False)
-			from bleach import Bleach
-			TAGS = ['b', 'em', 'i', 'strong', 'br', 'li', 'ul', 'ol', 'p', 'span', 'a']
-			bl = Bleach()
-			m.title = bl.clean(self.cleaned_data['title'])
-			m.body = bl.clean(self.cleaned_data['body'], tags=TAGS)
-			if commit:
-				m.save()
-			return m
+
 	class _AnonForm(ModelForm):
 		owner_if_anonymous = CharField(max_length = 150, label="Name")
 		url_if_anonymous = URLField(max_length=1000, label="URL", required=False)
@@ -65,8 +56,12 @@ def getConvoWithTitle(entry):
 	""" return list containing a sorted Entry thread """
 	sorted = []
 	original = entry.getOriginal()
-	sorted.append(original)
-	sorted.extend(__sortConvo(Entry.objects.filter(parent=original)))
+	if original:
+		if original.published==True:
+			sorted.append(original)
+		else:
+			return None, None
+	sorted.extend(__sortConvo(Entry.objects.filter(published = True).filter(parent=original)))
 	return sorted, original.title
 	
 def __sortConvo(children):
@@ -74,5 +69,5 @@ def __sortConvo(children):
 	sorted = []
 	for c in children:
 		sorted.append(c)
-		sorted.extend(__sortConvo(Entry.objects.filter(parent=c)))
+		sorted.extend(__sortConvo(Entry.objects.filter(published = True).filter(parent=c)))
 	return sorted

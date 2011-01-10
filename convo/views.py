@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from convo import Convo
 from convo.models import Entry, Edit
+from django.http import Http404 
 
 def add_new(request, nparent=None, form_class=None, success_url=None,
 			template_name='convo/add_new.html',
@@ -75,18 +76,21 @@ def show_entry(request, e_id, template_name='convo/show.html', extra_context = N
 def show_convo(request, e_id, template_name='convo/show_convo.html', extra_context = None):
 	""" Display a threaded conversation """
 	e = Entry.objects.get(pk=e_id)
-	from convo import Convo
-	es, title = Convo.getConvoWithTitle(e)
-	entries = []
-	for en in es:
-		entries.append(get_entry_template(request, en))	
-	t = loader.get_template(template_name)
-	if extra_context is None:
-		extra_context = {}
-	extra_context['entries'] = entries
-	extra_context['title'] = title
-	c = getContext(request, extra_context)
-	return HttpResponse(t.render(c))
+	if e.published:
+		from convo import Convo
+		es, title = Convo.getConvoWithTitle(e)
+		if es:
+			entries = []
+			for en in es:
+				entries.append(get_entry_template(request, en))	
+			t = loader.get_template(template_name)
+			if extra_context is None:
+				extra_context = {}
+			extra_context['entries'] = entries
+			extra_context['title'] = title
+			c = getContext(request, extra_context)
+			return HttpResponse(t.render(c))
+	raise Http404
 
 def get_entry_template(request, entry, template_name="convo/single_entry.html"):
 	""" Return the rendered template for a single item """
