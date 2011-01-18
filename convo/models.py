@@ -14,7 +14,7 @@ class Entry(models.Model):
 	original = models.ForeignKey('self', null=True, related_name="original_entry")
 	parent = models.ForeignKey('self', null=True, related_name="parent_entry")
 	title = models.CharField(max_length = 150)
-	slug = models.SlugField(max_length=250, db_index=True, editable=False)
+	slug = models.SlugField(max_length=250, db_index=True, editable=False, unique=True)
 	body = models.TextField(max_length = 4000)
 	owner = models.ForeignKey(User, null=True)
 	owner_if_anonymous = models.CharField(max_length = 150, null=True)

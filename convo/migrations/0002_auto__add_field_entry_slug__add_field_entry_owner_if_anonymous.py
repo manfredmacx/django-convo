@@ -9,12 +9,17 @@ class Migration(SchemaMigration):
 	def forwards(self, orm):
 		
 		# Adding field 'Entry.slug'
-		db.add_column('convo_entry', 'slug', self.gf('django.db.models.fields.SlugField')(default='FIXME', max_length=250, db_index=True), keep_default=False)
+		db.add_column('convo_entry', 'slug', self.gf('django.db.models.fields.SlugField')(default='FIXME', max_length=250, db_index=True, unique=True), keep_default=False)
 
 		# Adding field 'Entry.owner_if_anonymous'
 		db.add_column('convo_entry', 'owner_if_anonymous', self.gf('django.db.models.fields.CharField')(max_length=150, null=True), keep_default=False)
 		
+		# Adding field 'Entry.owner_if_anonymous'
+		db.add_column('convo_entry', 'url_if_anonymous', self.gf('django.db.models.fields.URLField')(max_length=1000, null=True), keep_default=False)
 
+		# Adding field 'Entry.owner_if_anonymous'
+		db.add_column('convo_entry', 'published', self.gf('django.db.models.fields.BooleanField')(default=True), keep_default=False)
+	
 	def backwards(self, orm):
 		
 		# Deleting field 'Entry.slug'
@@ -23,6 +28,11 @@ class Migration(SchemaMigration):
 		# Deleting field 'Entry.owner_if_anonymous'
 		db.delete_column('convo_entry', 'owner_if_anonymous')
 	
+		# Deleting field 'Entry.owner_if_anonymous'
+		db.delete_column('convo_entry', 'url_if_anonymous')
+		
+		# Deleting field 'Entry.owner_if_anonymous'
+		db.delete_column('convo_entry', 'published')
 	
 	models = {
 		'auth.group': {
