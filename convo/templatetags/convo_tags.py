@@ -16,7 +16,7 @@ class Gravatar(template.Node):
 	def render(self, context):
 		default = choice(("identicon", "monsterid", "wavatar"))
 		size = 55
-		gravatar_url = "http://www.gravatar.com/avatar/"
+		gravatar_url = "https://secure.gravatar.com/avatar/"
 		try:
 			gravatar_url += hashlib.md5(self.email.resolve(context)).hexdigest() + "?"
 		except:
