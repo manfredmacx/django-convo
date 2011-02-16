@@ -58,9 +58,6 @@ def getConvoWithTitle(entry):
 	sorted = []
 	original = entry.getOriginal()
 	if original:
-		print original
-		print original.title
-		print original.published		
 		if original.published == True:
 			sorted.append(original)
 		else:
