@@ -1,7 +1,7 @@
 """
 	Util class
 """
-from django.forms import ModelForm, CharField, URLField
+from django.forms import ModelForm, CharField, URLField, BooleanField
 from django.db import models
 from models import Entry
 
@@ -22,9 +22,10 @@ def getForm(user):
 				m.save()
 			return m
 	class _AdminForm(ModelForm):
+		published = BooleanField(required = False, initial = False)
 		class Meta:
 			model = Entry
-			fields = ('title', 'body',)
+			fields = ('title', 'body', 'published')
 
 	class _AnonForm(ModelForm):
 		owner_if_anonymous = CharField(max_length = 150, label="Name")
@@ -57,7 +58,10 @@ def getConvoWithTitle(entry):
 	sorted = []
 	original = entry.getOriginal()
 	if original:
-		if original.published==True:
+		print original
+		print original.title
+		print original.published		
+		if original.published == True:
 			sorted.append(original)
 		else:
 			return None, None
