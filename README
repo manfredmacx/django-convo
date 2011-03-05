@@ -12,8 +12,8 @@ A logged in user can also edit any post by an anonymous user.
 If the Django user's email is connected to a Gravatar account, that icon will be used to identify the user.  If not, a random default Gravatar icon will be used.  Free accounts available at http://www.gravatar.com
 
 Dependencies:
-Django-wysiwyg - WYSIWYG editor for creating and editing entries  (http://github.com/pydanny/django-wysiwyg)
-Bleach - HTML sanitizer for cleaning user-submitted content (http://pypi.python.org/pypi/bleach)
+Django-wysiwyg (our forked version)- WYSIWYG editor for creating and editing entries  (http://github.com/manfredmacx/django-wysiwyg)
+Bleach (version >= 1.0.0)- HTML sanitizer for cleaning user-submitted content (http://pypi.python.org/pypi/bleach)
 
 This app is live and in production at http://www.manfredmacx.com/social/
 

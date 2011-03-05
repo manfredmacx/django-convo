@@ -13,11 +13,10 @@ def getForm(user):
 			fields = ('title', 'body',)
 		def save(self, force_insert=False, force_update=False, commit=True):
 			m = super(ModelForm, self).save(commit=False)
-			from bleach import Bleach
+			import bleach
 			TAGS = ['b', 'em', 'i', 'strong', 'br', 'li', 'ul', 'ol', 'p', 'span']
-			bl = Bleach()
-			m.title = bl.clean(self.cleaned_data['title'])
-			m.body = bl.clean(self.cleaned_data['body'], tags=TAGS)
+			m.title = bleach.clean(self.cleaned_data['title'])
+			m.body = bleach.clean(self.cleaned_data['body'], tags=TAGS)
 			if commit:
 				m.save()
 			return m
@@ -35,11 +34,10 @@ def getForm(user):
 			fields = ('title', 'owner_if_anonymous', 'url_if_anonymous', 'body')
 		def save(self, force_insert=False, force_update=False, commit=True):
 			m = super(ModelForm, self).save(commit=False)
-			from bleach import Bleach
+			import bleach
 			TAGS = ['b', 'em', 'i', 'strong', 'br', 'li', 'ul', 'ol', 'p', 'span']
-			bl = Bleach()
-			m.title = bl.clean(self.cleaned_data['title'])
-			m.body = bl.clean(self.cleaned_data['body'], tags=TAGS)
+			m.title = bleach.clean(self.cleaned_data['title'])
+			m.body = bleach.clean(self.cleaned_data['body'], tags=TAGS)
 			if commit:
 				m.save()
 			return m
