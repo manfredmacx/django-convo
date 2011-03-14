@@ -113,13 +113,16 @@ def edit_entry(request, e_id, form_class=None, success_url=None,
 		if success_url is None:
 			success_url = "/"
 		if request.method == 'POST':
+			# have to check if e is published here before e gets its update from the form
+			addEdit = e.published
 			form = form_class(data=request.POST, instance=e)
 			if form.is_valid():
 				en = form.save()
-				edit = Edit()
-				edit.entry = en
-				edit.edit_by = request.user
-				edit.save()
+				if addEdit:
+					edit = Edit()
+					edit.entry = en
+					edit.edit_by = request.user
+					edit.save()
 			return HttpResponseRedirect(success_url)
 		else:
 			form = form_class(instance=e)   
