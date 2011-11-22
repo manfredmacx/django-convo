@@ -73,7 +73,7 @@ def show_entry(request, e_id, template_name='convo/show.html', extra_context = N
 	c = getContext(request, extra_context)
 	return HttpResponse(t.render(c))
 
-def show_convo(request, e_id, template_name='convo/show_convo.html', extra_context = None):
+def show_convo(request, e_id, template_name='convo/show_convo.html', single_template_name=None, extra_context = None):
 	""" Display a threaded conversation """
 	e = Entry.objects.get(pk=e_id)
 	if e.published:
@@ -82,7 +82,10 @@ def show_convo(request, e_id, template_name='convo/show_convo.html', extra_conte
 		if es:
 			entries = []
 			for en in es:
-				entries.append(get_entry_template(request, en))	
+				if single_template_name and en.level==1:
+					entries.append(get_entry_template(request, en, single_template_name))	
+				else:
+					entries.append(get_entry_template(request, en))	
 			t = loader.get_template(template_name)
 			if extra_context is None:
 				extra_context = {}
